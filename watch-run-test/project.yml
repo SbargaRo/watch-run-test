@@ -1,0 +1,48 @@
+name: WatchRun
+options:
+  bundleIdPrefix: com.roccotest
+  deploymentTarget:
+    iOS: "17.0"
+    watchOS: "10.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  WatchRun:
+    type: application
+    platform: iOS
+    sources:
+      - WatchRun
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.roccotest.watchrun
+    info:
+      path: Config/WatchRun-Info.plist
+      properties:
+        CFBundleDisplayName: WatchRun
+        UILaunchScreen: {}
+    dependencies:
+      - target: WatchRunWatch
+  WatchRunWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - WatchRunWatch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.roccotest.watchrun.watchkitapp
+    info:
+      path: Config/WatchRunWatch-Info.plist
+      properties:
+        CFBundleDisplayName: WatchRun
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.roccotest.watchrun
+        NSHealthShareUsageDescription: Serve per leggere la frequenza cardiaca durante le corse.
+        NSHealthUpdateUsageDescription: Serve per salvare gli allenamenti.
+    entitlements:
+      path: Config/WatchRunWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []

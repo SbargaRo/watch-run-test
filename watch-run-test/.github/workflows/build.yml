@@ -1,0 +1,54 @@
+name: Build WatchRun
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Versioni
+        run: xcodebuild -version
+
+      - name: Installa XcodeGen
+        run: brew install xcodegen
+
+      - name: Genera il progetto Xcode
+        run: xcodegen generate
+
+      - name: Compila senza firma
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project WatchRun.xcodeproj \
+            -scheme WatchRun \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build 2>&1 | tee build.log
+
+      - name: Crea il file .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/WatchRun.app Payload/
+          zip -qr WatchRun.ipa Payload
+
+      - name: Salva l'ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: WatchRun-ipa
+          path: WatchRun.ipa
+
+      - name: Salva il log in caso di errore
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
